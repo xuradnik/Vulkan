@@ -26,9 +26,13 @@ target_include_directories(glm INTERFACE external)
 # 3. YOUR EXECUTABLE
 add_executable(Vulkan src/main.cpp
         src/first_app.cpp
-        src/first_app.h
-        src/vulcan_engine_window.cpp
-        src/vulcan_engine_window.h)
+        src/first_app.hpp
+        src/lve_window.cpp
+        src/lve_window.hpp
+        src/lve_pipeline.cpp
+        src/lve_pipeline.hpp
+        src/lve_device.hpp
+        src/lve_device.cpp)
 
 # 4. LINKING
 target_link_libraries(Vulkan

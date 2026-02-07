@@ -1,9 +1,9 @@
 
-#include "first_app.h"
+#include "first_app.hpp"
 
 namespace lve {
     void First_App::run() {
-        while (!m_vulcan_engine_window.shouldClose()) {
+        while (!lveWindow.shouldClose()) {
             glfwPollEvents();
         }
     }
