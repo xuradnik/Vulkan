@@ -1,0 +1,25 @@
+# --- CLion / CMake Build Files ---
+
+cmake-build-*/
+build/
+bin/
+lib/
+
+# --- IDE Settings ---
+.idea/
+.vs/
+
+# --- Compiled Binaries ---
+*.exe
+*.dll
+*.so
+*.dylib
+*.pdb
+*.obj
+*.lib
+*.a
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
+
