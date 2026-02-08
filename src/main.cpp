@@ -1,12 +1,12 @@
 
-#include "first_app.hpp"
+#include "FirstApp.hpp"
 
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
 int main(void) {
-    lve::First_App app{};
+    lve::FirstApp app{};
 
     try {
         app.run();

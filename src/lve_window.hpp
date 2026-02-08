@@ -4,6 +4,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <string>
+#include <array>
 
 namespace lve {
 
@@ -24,6 +25,7 @@ namespace lve {
         LveWindow &operator =(const LveWindow&) = delete;
 
         bool shouldClose() const;
+        VkExtent2D getExtent() {return {static_cast<uint32_t>(m_width),static_cast<uint32_t>(m_height)};}
         void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
     };
 
