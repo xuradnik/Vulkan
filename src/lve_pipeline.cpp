@@ -4,10 +4,10 @@ namespace lve
 {
 	LvePipeline::LvePipeline
 		(
-			LveDevice &              device_p,
-			const std::string &      vertFilePath_p,
-			const std::string &      fragFilePath_p,
-			const PipelineConfigInfo configInfo_p
+			LveDevice &               device_p,
+			const std::string &       vertFilePath_p,
+			const std::string &       fragFilePath_p,
+			const PipelineConfigInfo &configInfo_p
 		)
 	: m_device(device_p) {
 		createGraphicsPipeline(vertFilePath_p, fragFilePath_p, configInfo_p);
@@ -29,23 +29,17 @@ namespace lve
 	}
 
 
-	PipelineConfigInfo LvePipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height) {
-		PipelineConfigInfo configInfo { };
-
+	void LvePipeline::defaultPipelineConfigInfo(PipelineConfigInfo &configInfo) {
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
-		configInfo.viewport.x        = 0.0f;
-		configInfo.viewport.y        = 0.0f;
-		configInfo.viewport.width    = static_cast <float>(width);
-		configInfo.viewport.height   = static_cast <float>(height);
-		configInfo.viewport.minDepth = 0.0f;
-		configInfo.viewport.maxDepth = 1.0f;
 
-		configInfo.scissor.offset = { 0, 0 };
-		configInfo.scissor.extent = { width, height };
-
+		configInfo.vieportInfo.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		configInfo.vieportInfo.viewportCount = 1;
+		configInfo.vieportInfo.pViewports    = nullptr;
+		configInfo.vieportInfo.scissorCount  = 1;
+		configInfo.vieportInfo.pScissors     = nullptr;
 
 		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -99,7 +93,11 @@ namespace lve
 		configInfo.depthStencilInfo.front                 = { }; // Optional
 		configInfo.depthStencilInfo.back                  = { }; // Optional
 
-		return configInfo;
+		configInfo.dynamicStateEnable                 = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+		configInfo.dynamicStateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		configInfo.dynamicStateInfo.pDynamicStates    = configInfo.dynamicStateEnable.data();
+		configInfo.dynamicStateInfo.dynamicStateCount = static_cast <uint32_t>(configInfo.dynamicStateEnable.size());
+		configInfo.dynamicStateInfo.flags             = 0;
 	}
 
 
@@ -123,9 +121,9 @@ namespace lve
 
 	void LvePipeline::createGraphicsPipeline
 		(
-			const std::string &      vertFilePath,
-			const std::string &      fragFilePath,
-			const PipelineConfigInfo configInfo_p
+			const std::string &       vertFilePath,
+			const std::string &       fragFilePath,
+			const PipelineConfigInfo &configInfo_p
 		) {
 		assert
 			(
@@ -174,13 +172,6 @@ namespace lve
 		vertexInputInfo.pVertexAttributeDescriptions    = attributeDescriptions.data();
 		vertexInputInfo.pVertexBindingDescriptions      = bindingDescriptions.data();
 
-		VkPipelineViewportStateCreateInfo viewportInfo { };
-		viewportInfo.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		viewportInfo.viewportCount = 1;
-		viewportInfo.pViewports    = &configInfo_p.viewport;
-		viewportInfo.scissorCount  = 1;
-		viewportInfo.pScissors     = &configInfo_p.scissor;
-
 
 		VkGraphicsPipelineCreateInfo pipelineInfo { };
 		pipelineInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -188,12 +179,12 @@ namespace lve
 		pipelineInfo.pStages             = shaderStages;
 		pipelineInfo.pVertexInputState   = &vertexInputInfo;
 		pipelineInfo.pInputAssemblyState = &configInfo_p.inputAssemblyInfo;
-		pipelineInfo.pViewportState      = &viewportInfo;
+		pipelineInfo.pViewportState      = &configInfo_p.vieportInfo;
 		pipelineInfo.pRasterizationState = &configInfo_p.rasterizationInfo;
 		pipelineInfo.pMultisampleState   = &configInfo_p.multisampleInfo;
 		pipelineInfo.pColorBlendState    = &configInfo_p.colorBlendInfo;
 		pipelineInfo.pDepthStencilState  = &configInfo_p.depthStencilInfo;
-		pipelineInfo.pDynamicState       = nullptr;
+		pipelineInfo.pDynamicState       = &configInfo_p.dynamicStateInfo;
 
 		pipelineInfo.layout     = configInfo_p.pipelineLayout;
 		pipelineInfo.renderPass = configInfo_p.renderPass;

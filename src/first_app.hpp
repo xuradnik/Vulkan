@@ -15,9 +15,9 @@ namespace lve
 {
 	class FirstApp {
 		private:
-			LveWindow    m_lveWindow { WIDTH, HEIGHT, "Vulkan" };
-			LveDevice    m_lveDevice { m_lveWindow };
-			LveSwapChain m_lveSwapChain { m_lveDevice, m_lveWindow.getExtent() };
+			LveWindow                      m_lveWindow { WIDTH, HEIGHT, "Vulkan" };
+			LveDevice                      m_lveDevice { m_lveWindow };
+			std::unique_ptr <LveSwapChain> m_lveSwapChain;
 
 			std::unique_ptr <LvePipeline> m_lve_pipeline;
 			VkPipelineLayout              m_pipelineLayout;
@@ -30,6 +30,8 @@ namespace lve
 			void createCommandBuffers();
 			void drawFrame();
 			void loadModels();
+			void recreateSwapChain();
+			void recordCommandBuffer(int imageIndex_p) const;
 
 		public:
 			static constexpr int WIDTH  = 800;

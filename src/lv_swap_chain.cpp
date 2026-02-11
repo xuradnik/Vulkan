@@ -14,6 +14,18 @@ namespace lve
 	LveSwapChain::LveSwapChain(LveDevice &deviceRef, VkExtent2D extent)
 	: device { deviceRef }
 	, windowExtent { extent } {
+		init();
+	}
+
+	LveSwapChain::LveSwapChain(LveDevice &deviceRef, VkExtent2D extent, std::shared_ptr <LveSwapChain> previous)
+	: device { deviceRef }
+	, windowExtent { extent }
+	, oldSwapChain { previous } {
+		init();
+		oldSwapChain = nullptr;
+	}
+
+	void LveSwapChain::init() {
 		createSwapChain();
 		createImageViews();
 		createRenderPass();
@@ -168,7 +180,7 @@ namespace lve
 		createInfo.presentMode = presentMode;
 		createInfo.clipped     = VK_TRUE;
 
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
 		if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create swap chain!");
@@ -296,7 +308,8 @@ namespace lve
 	}
 
 	void LveSwapChain::createDepthResources() {
-		VkFormat   depthFormat     = findDepthFormat();
+		VkFormat depthFormat       = findDepthFormat();
+		swapChainDepthFormat       = depthFormat;
 		VkExtent2D swapChainExtent = getSwapChainExtent();
 
 		depthImages.resize(imageCount());
@@ -373,7 +386,7 @@ namespace lve
 			const std::vector <VkSurfaceFormatKHR> &availableFormats
 		) {
 		for (const auto &availableFormat : availableFormats) {
-			if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
+			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
 				availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
 				return availableFormat;
 			}

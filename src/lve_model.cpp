@@ -44,9 +44,26 @@ namespace lve
 			);
 
 		void *data;
-		vkMapMemory(m_lveDevice.device(), m_vertexBufferMemory, 0, bufferSize, 0, &data);
-		mempcpy(data, vertices.data(), static_cast <size_t>(bufferSize));
-		vkUnmapMemory(m_lveDevice.device(), m_vertexBufferMemory);
+		vkMapMemory
+			(
+				m_lveDevice.device(),
+				m_vertexBufferMemory,
+				0,
+				bufferSize,
+				0,
+				&data
+			);
+		mempcpy
+			(
+				data,
+				vertices.data(),
+				static_cast <size_t>(bufferSize)
+			);
+		vkUnmapMemory
+			(
+				m_lveDevice.device(),
+				m_vertexBufferMemory
+			);
 	}
 
 	// Inside Struct Methodes
@@ -62,12 +79,17 @@ namespace lve
 	}
 
 	std::vector <VkVertexInputAttributeDescription> LveModel::Vertex::getAttributeDescriptions() {
-		std::vector <VkVertexInputAttributeDescription> atributeDescriptions(1);
+		std::vector <VkVertexInputAttributeDescription> atributeDescriptions(2);
 
 		atributeDescriptions[0].binding  = 0;
 		atributeDescriptions[0].location = 0;
 		atributeDescriptions[0].format   = VK_FORMAT_R32G32_SFLOAT;
-		atributeDescriptions[0].offset   = 0;
+		atributeDescriptions[0].offset   = offsetof(Vertex, m_position);
+
+		atributeDescriptions[1].binding  = 0;
+		atributeDescriptions[1].location = 1;
+		atributeDescriptions[1].format   = VK_FORMAT_R32G32B32_SFLOAT;
+		atributeDescriptions[1].offset   = offsetof(Vertex, m_color);
 
 		return atributeDescriptions;
 	}
